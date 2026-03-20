@@ -2,17 +2,20 @@ package main
 
 import (
 	"os"
+	"fmt"
 )
+
+func _(){fmt.Print()}
 
 type Builtin struct{}
 var builtin Builtin
 
 func (Builtin) Err_Out(str string) {
-	os.Stderr.WriteString(str)
+	os.Stderr.WriteString("\n" + str + "\n")
 	os.Exit(1)
 }
 
-func (Builtin) Print(str []byte) {
+func (Builtin) Print(input []Token) {
 	//var res []byte
 	//var i int; var b byte; loop: {
 	//	b = str[i]
@@ -28,7 +31,9 @@ func (Builtin) Print(str []byte) {
 	//	if i < len(str) {	goto loop }
 	//}
 	//if res == nil { return }
-	os.Stdout.Write(str)
+	for _, t := range input {
+		os.Stdout.Write(append(t.Raw, ' '))
+	}
 }
 
 func (Builtin) Get_Esc(b byte) byte {
