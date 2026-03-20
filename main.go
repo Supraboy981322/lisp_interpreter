@@ -13,9 +13,6 @@ const (
 	STRING
 )
 
-type Builtin struct{}
-var builtin Builtin
-
 type P struct{
 	idx int
 	cur byte
@@ -27,11 +24,15 @@ type Token struct {
 	Type TokType
 }
 func main() {
-	eval(recurse([]byte(os.Args[1])))
+	code := []byte(`
+(print "foo\n")
+`)
+	eval(recurse(code))
 }
 
 func recurse(code []byte) []Token {
 	var p = P{
+		idx: -1,
 		code: code,
 	}
 	for p.next() {
@@ -40,8 +41,7 @@ func recurse(code []byte) []Token {
 			case '"': {
 				p.Toks = append(p.Toks, mktok(STRING, p.seek_to('"')))
 			}
-		  case ' ': panic("foo")
-			case ')':
+			case ')', '\n', ' ':
 			default: {
 				c := p.cur
 				thing := append([]byte{c}, p.seek_to(' ')...)
@@ -135,9 +135,4 @@ func (p *P) seek_to(c byte) []byte {
 func (p *P) peakN(n int) []byte {
 	if len(p.code) <= p.idx+n { return nil }
 	return p.code[p.idx:][:n]
-}
-
-func (Builtin) Print(str []byte) {
-	// TODO: parse string for escapes
-	fmt.Println(string(str))
 }
