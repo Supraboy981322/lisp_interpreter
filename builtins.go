@@ -33,15 +33,20 @@ func (Builtin) Print(str []byte) {
 
 func (Builtin) get_control_char(b byte) byte {
 	switch b {
-		case 'n': return '\n'
-		case 'b': return '\b'
-		case 'r': return '\r'
-		case 'a': return '\a'
-		case 't': return '\t'
-		case 'v': return '\v'
-		case 'f': return '\f'
-		case 'e': return '\x1b'
+
+		case 'n': return '\n'   //newline
+		case 'b': return '\b'   //backspace
+		case 'r': return '\r'   //return
+		case 'a': return '\a'   //bell character (never used a terminal that does anything with this)
+		case 't': return '\t'   //tab
+		case 'v': return '\v'   //vertical tab (I keep forgetting this one exists)
+		case 'f': return '\f'   //form-feed (what's the purpose of this in modern terminals?)
+		case 'e': return '\x1b' //much simpler to just have a one-char ansi escape
+		case '0': return 0      //null character
+
+		//anything else isn't accepted as valid
 		default: builtin.Err_Out("invalid escape")
 	}
-	return 0
+
+	return 0 //shouldn't happen, default errs out
 }
