@@ -25,7 +25,7 @@ type Token struct {
 }
 func main() {
 	code := []byte(`
-(print "\e[33mcar\bt\e[0m =\t=\nfoo\rb\vfoo\a\n")
+(print "\e[33mcar\bt\e[0m =\t=\nfoo\rb\vfoo\a\n\"")
 `)
 	eval(recurse(code))
 }
@@ -83,7 +83,7 @@ func (P) match_name(name []byte) TokType {
 func eval(input []Token) {
 	if len(input) < 1 { return }
 	for _, t := range input {
-		fmt.Println("|" + string(t.Raw) + "|")
+		fmt.Println("|" + string(builtin.Un_Escape(t.Raw)) + "|")
 	}
 	switch input[0].Type {
 		case TokType(PRINT): { builtin.Print(input[1].Raw) }
@@ -125,9 +125,20 @@ func (p *P) seekN(n int) []byte {
 
 func (p *P) seek_to(c byte) []byte {
 	var mem []byte
-	for p.next() {
-		if p.cur == c { return mem }
-		mem = append(mem, p.cur)
+	var esc bool
+	loop: for p.next() {
+		if p.cur == '\\' {
+			esc = true
+			continue loop
+		}
+		if p.cur == c && !esc { return mem }
+		//ternary wouldn've been nice here
+		if esc {
+			mem = append(mem, builtin.Get_Esc(p.cur))
+		} else {
+			mem = append(mem, p.cur)
+		}
+		esc = false
 	}
 	return nil
 }
