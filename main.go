@@ -25,7 +25,7 @@ type Token struct {
 }
 func main() {
 	code := []byte(`
-(print "foo\n")
+(print "\e[33mfoo\e[0m\n")
 `)
 	eval(recurse(code))
 }

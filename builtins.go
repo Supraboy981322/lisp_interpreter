@@ -19,7 +19,7 @@ func (Builtin) Print(str []byte) {
 		switch b {
 			case '\\': {
 				if len(str) <= i+1 { builtin.Err_Out("unexpected end of string") }
-				res = append(res, builtin.mk_escape_or_control_char(str[i+1]))
+				res = append(res, builtin.get_control_char(str[i+1]))
 				i++
 			}
 			default: { res = append(res, b) }
@@ -31,14 +31,16 @@ func (Builtin) Print(str []byte) {
 	os.Stdout.Write(res)
 }
 
-func (Builtin) mk_escape_or_control_char(b byte) byte {
-	// TODO: other ASCII control characters and ANSI
+func (Builtin) get_control_char(b byte) byte {
 	switch b {
 		case 'n': return '\n'
 		case 'b': return '\b'
 		case 'r': return '\r'
 		case 'a': return '\a'
-		// TODO: ansi
+		case 't': return '\t'
+		case 'v': return '\v'
+		case 'f': return '\f'
+		case 'e': return '\x1b'
 		default: builtin.Err_Out("invalid escape")
 	}
 	return 0
