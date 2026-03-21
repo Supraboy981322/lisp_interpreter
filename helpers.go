@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	keeper "github.com/Supraboy981322/keeper/golang"
 )
+
+func _(){fmt.Print()}
 
 func (p *P) next() bool {
 	p.cur = p.seek()
@@ -41,10 +44,18 @@ func (p *P) peekN(n int) []byte {
 
 func seek_toks(input *[]Token) []Token {
 	var output []Token
-	for (*input)[0].Type != EOX {
+	var depth int
+	var started bool
+	for {
+		if started && depth < 1 { break }
 		keeper.Add(&output, (*input)[0])
 		keeper.Shift(input)
+		switch (*input)[0].Type {
+			case BOX: { depth++ }
+			case EOX: { depth-- }
+		}
 		if len(*input) < 1 { return output }
+		started = true
 	}
 	return output
 }
@@ -87,38 +98,88 @@ func unmatch_token(tok Token) string {
 	}
 }
 
+func (p *P) collapse_str() []byte {
+	var mem []byte
+	defer func(){
+		//fmt.Printf("|\x1b[33m%s\x1b[0m|\n", builtin.Un_Escape(mem))
+	}()
+	var esc bool
+	for p.next() {
+		if p.cur == '"' && !esc { return mem }
+		if esc {
+			esc = false
+			if p.cur == '"'  || p.cur == '\\' {
+				keeper.Add(&mem, p.cur)
+			} else {
+				keeper.Add(&mem, builtin.Get_Esc(p.cur))
+			}
+		} else {
+			if p.cur == '\\' {
+				esc = true
+			} else {
+				keeper.Add(&mem, p.cur)
+			}
+		}
+	}
+	return mem
+}
+
 // TODO: more universal seek (ie: not having separate logic for string)
 func (p *P) seek_to(c byte) []byte {
 	var mem []byte
 	var esc bool
 	if c == '"' {
-		for p.next() {
-			if esc { continue }
-			switch p.cur {
-				case '"': if !esc { return mem } else { mem = append(mem, p.cur) }
-				case '\\': esc = !esc
-				default: if esc {
-					mem = append(mem, builtin.Get_Esc(p.cur))
-				} else {
-					mem = append(mem, p.cur)
-				}
+		return p.collapse_str()
+	}
+	for p.next() {
+		switch p.cur {
+			case '\\': if esc {
+				mem = append(mem, p.cur)
+			}; esc = !esc
+
+			case '"': if esc {
+				mem = append(mem, p.cur)
+			} else {
+				//fmt.Printf("collapsing (%c)\n", c)
+				//fmt.Printf("before mem (\v\033[34m%s\033[0m\v)\n", string(mem))
+				mem = append(mem, p.collapse_str()...)
+				p.toss()
+				//fmt.Printf("after mem (\v\033[34m%s\033[0m\v)\n", string(mem))
 			}
+			
+			case c: if esc {
+				mem = append(mem, p.cur)
+			} else {
+				return mem
+			}
+
+			default: mem = append(mem, p.cur)
 		}
-		return mem
 	}
-	loop: for p.next() {
-		if p.cur == '\\' {
-			esc = true
-			continue loop
+	return nil
+}
+
+func (p *P) previous() byte {
+	return p.code[p.idx-1]
+}
+
+func (p *P) back() byte {
+	p.cur = p.previous()
+	return p.cur
+}
+
+func (p *P) seek_whitespace() []byte {
+	var mem []byte
+	defer func() {
+	}()
+	var esc bool
+	_ = esc
+	for p.next() {
+		switch p.cur {
+			case ' ', '\n', '\t', '\r': return mem
+			default: mem = append(mem, p.cur)
 		}
-		if p.cur == c && !esc { return mem }
-		//ternary wouldn've been nice here
-		if esc {
-			mem = append(mem, builtin.Get_Esc(p.cur))
-		} else {
-			mem = append(mem, p.cur)
-		}
-		esc = false
 	}
+
 	return nil
 }
