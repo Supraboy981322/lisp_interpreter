@@ -78,24 +78,31 @@ func (P) match_name(name []byte) (TokTypeNote, TokType) {
 		case "&":      return TokTypeNote(OPERATOR), TokType(AND)
 		case "|":      return TokTypeNote(OPERATOR), TokType(OR)
 		case ";":      return TokTypeNote(NONE),     TokType(COMMENT)
+		case "<":      return TokTypeNote(COMPARE),  TokType(LESS_THAN)
+		case ">":      return TokTypeNote(COMPARE),  TokType(GREATER_THAN)
+		case "=":      return TokTypeNote(COMPARE),  TokType(EQL_TO)
 		default:       return TokTypeNote(IGNORE),   TokType(INVALID)
 	}
 }
 
 func unmatch_token(tok Token) string {
 	switch tok.Type {
-		case TokType(STDOUT):  return "[STDOUT]"
-		case TokType(STDERR):  return "[STDERR]"
-		case TokType(RUN):     return "[RUN]"
-		case TokType(IF):      return "[IF]"
-		case TokType(ELSE):    return "[ELSE]"
-		case TokType(AND):     return "[AND]"
-		case TokType(OR):      return "[OR]"
-		case TokType(COMMENT): return "[COMMENT]"
-		case TokType(INVALID): return "[INVALID]"
-		case TokType(STRING):  return "[STRING]"
-		case TokType(EOX):     return "[EOX]"
-		case TokType(BOX):     return "[BOX]"
+		case TokType(STDOUT):       return "[STDOUT]"
+		case TokType(STDERR):       return "[STDERR]"
+		case TokType(RUN):          return "[RUN]"
+		case TokType(IF):           return "[IF]"
+		case TokType(ELSE):         return "[ELSE]"
+		case TokType(AND):          return "[AND]"
+		case TokType(OR):           return "[OR]"
+		case TokType(COMMENT):      return "[COMMENT]"
+		case TokType(INVALID):      return "[INVALID]"
+		case TokType(STRING):       return "[STRING]"
+		case TokType(EOX):          return "[EOX]"
+		case TokType(BOX):          return "[BOX]"
+		case TokType(GREATER_THAN): return "[GREATER_THAN]"
+		case TokType(LESS_THAN):    return "[LESS_THAN]"
+		case TokType(EQL_TO):       return "[EQL_TO]"
+		case TokType(NUMBER):       return "[NUMBER]"
 		default:
 			panic("UNKNOWN TOKEN: |" + string(tok.Raw) + "|")
 	}
@@ -168,6 +175,7 @@ func (p *P) back() byte {
 func (p *P) seek_whitespace() []byte {
 	var mem []byte
 	var esc bool
+	defer p.back()
 	_ = esc
 	for p.next() {
 		switch p.cur {
@@ -176,5 +184,17 @@ func (p *P) seek_whitespace() []byte {
 		}
 	}
 
+	return nil
+}
+
+func (p *P) seek_num() []byte {
+	str := []byte{p.cur}
+	for p.next() {
+		if p.cur >= '0' && p.cur <= '9' {
+			keeper.Add(&str, p.cur)
+		} else {
+			return str
+		}
+	}
 	return nil
 }
