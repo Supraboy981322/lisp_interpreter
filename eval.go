@@ -7,36 +7,45 @@ import (
 )
 
 func eval(input []Token) {
+	//ignore empty input
 	if len(input) < 1 { return }
+
+	//local helper to seek to EOX 
 	mk_args := func() []Token {
-		return nil
+		keeper.Shift(&input)
+		return seek_toks(&input)
 	}
-	_ = mk_args
+
+	//local helper to string-together the raw strings
+	//  of each arg from seek to EOX 
+	string_args := func() []byte {
+		var str []byte
+		for _ , t := range mk_args() {
+			keeper.Add(&str, append(t.Raw, ' ')...)
+		}
+		return str
+	}
+
+	//who needs a 'for' loop anyways?
 	loop: {
 		thing := input[0]
 		switch thing.Type {
-			case TokType(STDOUT): {
-				keeper.Shift(&input)
-				builtin.Stdout(seek_toks(&input));
-			}
-			case TokType(STDERR): {
-				keeper.Shift(&input)
-				builtin.Stderr(seek_toks(&input));
-			}
-			case TokType(RUN): {
-				keeper.Shift(&input)
-				toks := seek_toks(&input)
-				var str []byte
-				for _, t := range toks {
-					keeper.Add(&str, append(t.Raw, ' ')...)
-				}
-				eval(recurse(str))
-			}
+
+			//builtin functions
+			case TokType(STDOUT): { builtin.Stdout(mk_args()) }
+			case TokType(STDERR): { builtin.Stderr(mk_args()) }
+			case TokType(RUN):    { eval(recurse(string_args())) }
+
+			//ignore EOX and BOX
 			case TokType(EOX), TokType(BOX):
+
+			//err on invalid tokens  TODO: there's probably a better way to handle this
 			case TokType(INVALID): builtin.Err_Out(
 				"invalid token as fn call: |" + string(thing.Raw) + "|",
 			)
+
 			default: {
+				//err if not a function
 				if thing.Note != FN {
 					builtin.Err_Out(
 						fmt.Sprintf(
@@ -45,6 +54,8 @@ func eval(input []Token) {
 						),
 					)
 				}
+
+				// TODO: functions
 				fmt.Printf(
 					"\n\x1b[1;31munknown fn name\x1b[0m\n" +
 					"\x1b[35m(debug: %#v) (unmatched: %s) (type note: %v)\x1b[0m:\n" +
