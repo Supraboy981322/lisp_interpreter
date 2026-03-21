@@ -45,9 +45,12 @@ func eval(input []Token) []Token {
 	}
 
 	var mem []Token
+	//defer func() {
+	//	for _, t := range mem { t.print() }
+	//}()
 
-	call := func(f func([]Token)[]Token) {
-		keeper.DrainInto(&mem, keeper.PtrOf(f(drain_args()))) 
+	call := func(f func([]Token, Token)[]Token, caller Token) {
+		keeper.DrainInto(&mem, keeper.PtrOf(f(drain_args(), caller))) 
 	}
 
 	//who needs a 'for' loop anyways?
@@ -55,25 +58,25 @@ func eval(input []Token) []Token {
 		//fmt.Println(len(input))
 		//for _, t := range input { t.print() }
 		thing := input[0]
-		switch thing.Type {
 
+		switch thing.Type {
 			case TokType(VOID): if len(input) <= 1 { return mem } else { goto skip }
 
 			//builtin functions
-			case TokType(STDOUT): { call(builtin.Stdout) }
-			case TokType(STDERR): { call(builtin.Stderr) }
+			case TokType(STDOUT): { call(builtin.Stdout, void) }
+			case TokType(STDERR): { call(builtin.Stderr, void) }
 			case TokType(RUN):    {
-				keeper.DrainInto(&mem, keeper.PtrOf(recurse_eval(recurse(string_args()))))
+				keeper.DrainInto(&mem, keeper.PtrOf(recurse_eval(recurse(string_args()), thing)))
 			}
 
 			//comparison
 			case TokType(GREATER_THAN), TokType(LESS_THAN), TokType(EQL_TO): {
-				call(compare)
+				call(compare, thing)
 			}
 
 			//ignore EOX and BOX
 			case TokType(EOX): return mem
-			case TokType(BOX): { call(recurse_eval) }
+			case TokType(BOX): { call(recurse_eval, void) }
 
 			//err on invalid tokens  TODO: there's probably a better way to handle this
 			case TokType(INVALID): builtin.Err_Out(
@@ -103,6 +106,7 @@ func eval(input []Token) []Token {
 		}
 		//keeper.Shift(&input)
 		skip: {
+			//filter-out void results from mem
 			keeper.FilterFunc(
 				func(tok Token) bool {
 					return tok.Type != VOID
@@ -116,13 +120,13 @@ func eval(input []Token) []Token {
 	return mem
 }
 
-func recurse_eval(input []Token) []Token {
-	if len(input) < 1 { return []Token{void_tok()} }
+func recurse_eval(input []Token, _ Token) []Token {
+	if len(input) < 1 { return void_return() }
 	if input[0].Type == BOX { keeper.Shift(&input) }
 	return eval(input)
 }
 
-func compare(args []Token) []Token {
+func compare(args []Token, how Token) []Token {
 	nums := []int{}
 	for _, a := range args {
 		if a.Type != NUMBER { builtin.Err_Out("NaN: " + string(a.Raw)) }
@@ -141,13 +145,12 @@ func compare(args []Token) []Token {
 		)
 	}
 
-	//mem = Token {
-	//	Raw: 
-	//}
-	//switch thing.Type {
-	//	case GREATER_THAN: {
-	//		 
-	//	}
-	//}
-	return []Token{}
+	//these could've been reduced to ternaries
+	switch how.Type {
+		case GREATER_THAN: if nums[0] > nums[1] { return []Token{True} } else { return []Token{False} }
+		case LESS_THAN: if nums[0] < nums[1] { return []Token{True} } else { return []Token{False} }
+		case EQL_TO: if nums[0] == nums[1] { return []Token{True} } else { return []Token{False} }
+	}
+
+	return []Token{void}
 }
