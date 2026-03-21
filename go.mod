@@ -1,4 +1,4 @@
-module foo
+module github.com/Supraboy981322/lisp_interpreter
 
 go 1.25.7
 
