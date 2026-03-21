@@ -15,9 +15,18 @@ func eval(input []Token) {
 				keeper.Shift(&input)
 				builtin.Print(seek_toks(&input));
 			}
+			case TokType(RUN): {
+				keeper.Shift(&input)
+				toks := seek_toks(&input)
+				var str []byte
+				for _, t := range toks {
+					keeper.Add(&str, append(t.Raw, ' ')...)
+				}
+				eval(recurse(str))
+			}
 			case TokType(EOX), TokType(BOX):
 			case TokType(INVALID): builtin.Err_Out(
-				string(append([]byte("invalid token as fn call: "), thing.Raw...)),
+				"invalid token as fn call: |" + string(thing.Raw) + "|",
 			)
 			default: {
 				if thing.Note != FN {
