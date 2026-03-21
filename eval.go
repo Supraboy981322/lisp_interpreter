@@ -21,8 +21,8 @@ func eval(input []Token) []Token {
 	}
 
 	//local helper to seek to EOX 
-	mk_args := func(in []Token) []Token {
-		toks := seek_toks(&in)
+	mk_args := func(in *[]Token) []Token {
+		toks := seek_toks(in)
 		shiftN(len(toks))
 		keeper.Shift(&toks)
 		return toks
@@ -32,14 +32,14 @@ func eval(input []Token) []Token {
 	//  of each arg from seek to EOX 
 	string_args := func() []byte {
 		var str []byte
-		for _ , t := range mk_args(input) {
+		for _ , t := range mk_args(&input) {
 			keeper.Add(&str, append(t.Raw, ' ')...)
 		}
 		return str
 	}
 
 	drain_args := func() []Token {
-		args := mk_args(input)
+		args := mk_args(&input)
 		shiftN(len(args))
 		return args
 	}
@@ -74,8 +74,9 @@ func eval(input []Token) []Token {
 				call(compare, thing)
 			}
 
-			//ignore EOX and BOX
+			//return on EOX
 			case TokType(EOX): return mem
+			//recurse on BOX
 			case TokType(BOX): { call(recurse_eval, void) }
 
 			//err on invalid tokens  TODO: there's probably a better way to handle this

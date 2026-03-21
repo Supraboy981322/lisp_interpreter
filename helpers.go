@@ -50,15 +50,16 @@ func seek_toks(input *[]Token) []Token {
 		keeper.Shift(input)
 		switch thing.Type {
 			case BOX: { recursing = true }
-			case EOX: {
-				if recursing {
-					keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem, void)))
-					mem = []Token{}
-					recursing = false
-				} else { return output }
+
+			case EOX: if recursing {
+		 	 keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem, void)))
+				mem = []Token{}
+				recursing = false
+			} else {
+				return output
 			}
-			default: 
-			if recursing {
+
+			default: if recursing {
 				keeper.Add(&mem, thing)
 			} else {
 				keeper.Add(&output, thing)
