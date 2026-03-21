@@ -90,6 +90,8 @@ func (P) match_name(name []byte) (TokTypeNote, TokType) {
 		case "<":      return TokTypeNote(COMPARE),  TokType(LESS_THAN)
 		case ">":      return TokTypeNote(COMPARE),  TokType(GREATER_THAN)
 		case "=":      return TokTypeNote(COMPARE),  TokType(EQL_TO)
+		case "TRUE":   return TokTypeNote(VALUE),    TokType(TRUE)
+		case "FALSE":  return TokTypeNote(VALUE),    TokType(FALSE)
 		default:       return TokTypeNote(IGNORE),   TokType(INVALID)
 	}
 }
@@ -113,8 +115,9 @@ func unmatch_token(tok Token) string {
 		case TokType(EQL_TO):       return "[EQL_TO]"
 		case TokType(NUMBER):       return "[NUMBER]"
 		case TokType(VOID):         return "[VOID]"
-		case TokType(TRUE):         return "[VOID]"
-		case TokType(FALSE):         return "[VOID]"
+		case TokType(TRUE):         return "[TRUE]"
+		case TokType(FALSE):        return "[FALSE]"
+		case TokType(QUIT):         return "[QUIT]"
 		default:
 			panic("UNKNOWN TOKEN: |" + string(tok.Raw) + "|")
 	}
@@ -184,6 +187,21 @@ func (p *P) back() byte {
 	return p.cur
 }
 
+func (p *P) seek_first() []byte {
+	var mem []byte
+	var esc bool
+	defer p.back()
+	_ = esc
+	for p.next() {
+		switch p.cur {
+			case ' ', '\n', '\t', '\r', ')': return mem
+			default: mem = append(mem, p.cur)
+		}
+	}
+
+	return nil
+}
+
 func (p *P) seek_whitespace() []byte {
 	var mem []byte
 	var esc bool
@@ -201,6 +219,7 @@ func (p *P) seek_whitespace() []byte {
 
 func (p *P) seek_num() []byte {
 	str := []byte{p.cur}
+	defer p.back()
 	for p.next() {
 		if p.cur >= '0' && p.cur <= '9' {
 			keeper.Add(&str, p.cur)
