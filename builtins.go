@@ -15,17 +15,17 @@ func (Builtin) Err_Out(str string) {
 	os.Exit(1)
 }
 
-func (Builtin) Stderr(input []Token) []Token {
+func (Builtin) Stderr(input []Token, _ Token) []Token {
 	for _, t := range input {
 		os.Stderr.Write(t.Raw)
 	}
-	return []Token{void_tok()}
+	return void_return()
 }
-func (Builtin) Stdout(input []Token) []Token {
+func (Builtin) Stdout(input []Token, _ Token) []Token {
 	for _, t := range input {
 		os.Stdout.Write(t.Raw)
 	}
-	return []Token{void_tok()}
+	return void_return()
 }
 
 func (Builtin) Get_Esc(b byte) byte {

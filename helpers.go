@@ -52,7 +52,7 @@ func seek_toks(input *[]Token) []Token {
 			case BOX: { recursing = true }
 			case EOX: {
 				if recursing {
-					keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem)))
+					keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem, void)))
 					mem = []Token{}
 					recursing = false
 				} else { return output }
@@ -112,6 +112,8 @@ func unmatch_token(tok Token) string {
 		case TokType(EQL_TO):       return "[EQL_TO]"
 		case TokType(NUMBER):       return "[NUMBER]"
 		case TokType(VOID):         return "[VOID]"
+		case TokType(TRUE):         return "[VOID]"
+		case TokType(FALSE):         return "[VOID]"
 		default:
 			panic("UNKNOWN TOKEN: |" + string(tok.Raw) + "|")
 	}
@@ -208,12 +210,8 @@ func (p *P) seek_num() []byte {
 	return nil
 }
 
-func void_tok() Token {
-	return Token {
-		Raw: []byte("[void]"),
-		Type: TokType(VOID),
-		Note: TokTypeNote(VALUE),
-	}
+func void_return() []Token {
+	return []Token {void}
 }
 
 func (t Token) note() string {

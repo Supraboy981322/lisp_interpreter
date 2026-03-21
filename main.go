@@ -67,5 +67,5 @@ func main() {
 		)
 	}
 	fmt.Println("\n\n========\n\n")
-	recurse_eval(recurse(code))
+	recurse_eval(recurse(code), void)
 }
