@@ -8,16 +8,19 @@ import (
 type TokType int
 const (
 	INVALID TokType = iota
-	PRINT
-	RUN
-	IF
-	ELSE
-	OR
-	AND
+	STDOUT  //'stdout'
+	STDERR  //'stderr'
+	RUN     //'run'
+	IF      //'?'
+	ELSE    //'?!'
+	TRUE    //'true'
+	FALSE   //'false'
+	OR      //'|'
+	AND     //'&'
 	STRING
-	EOX
-	BOX
-	COMMENT
+	BOX     //'('
+	EOX     //')'
+	COMMENT //';'
 	WHITESPACE
 )
 

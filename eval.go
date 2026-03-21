@@ -11,9 +11,13 @@ func eval(input []Token) {
 	loop: {
 		thing := input[0]
 		switch thing.Type {
-			case TokType(PRINT): {
+			case TokType(STDOUT): {
 				keeper.Shift(&input)
-				builtin.Print(seek_toks(&input));
+				builtin.Stdout(seek_toks(&input));
+			}
+			case TokType(STDERR): {
+				keeper.Shift(&input)
+				builtin.Stderr(seek_toks(&input));
 			}
 			case TokType(RUN): {
 				keeper.Shift(&input)

@@ -70,7 +70,8 @@ func mktok(note TokTypeNote, t TokType, raw []byte) Token {
 
 func (P) match_name(name []byte) (TokTypeNote, TokType) {
 	switch string(name) {
-		case "print": return TokTypeNote(FN), TokType(PRINT)
+		case "stdout": return TokTypeNote(FN), TokType(STDOUT)
+		case "stderr": return TokTypeNote(FN), TokType(STDERR)
 		case "run": return TokTypeNote(FN),  TokType(RUN)
 		case "?": return TokTypeNote(OPERATOR),  TokType(IF)
 		case "?!": return TokTypeNote(OPERATOR), TokType(ELSE)
@@ -83,7 +84,8 @@ func (P) match_name(name []byte) (TokTypeNote, TokType) {
 
 func unmatch_token(tok Token) string {
 	switch tok.Type {
-		case TokType(PRINT):   return "[PRINT]"
+		case TokType(STDOUT):   return "[STDOUT]"
+		case TokType(STDERR):   return "[STDERR]"
 		case TokType(RUN):     return "[RUN]"
 		case TokType(IF):      return "[IF]"
 		case TokType(ELSE):    return "[ELSE]"

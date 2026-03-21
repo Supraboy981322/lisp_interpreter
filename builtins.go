@@ -15,22 +15,13 @@ func (Builtin) Err_Out(str string) {
 	os.Exit(1)
 }
 
-func (Builtin) Print(input []Token) {
-	//var res []byte
-	//var i int; var b byte; loop: {
-	//	b = str[i]
-	//	switch b {
-	//		case '\\': {
-	//			if len(str) <= i+1 { builtin.Err_Out("unexpected end of string") }
-	//			res = append(res, builtin.get_esc(str[i+1]))
-	//			i++ //skip the next byte (the escaped character
-	//		}
-	//		default: { res = append(res, b) }
-	//	}
-	//	i++
-	//	if i < len(str) {	goto loop }
-	//}
-	//if res == nil { return }
+func (Builtin) Stderr(input []Token) {
+	for _, t := range input {
+		os.Stderr.Write(append(t.Raw, ' '))
+	}
+}
+
+func (Builtin) Stdout(input []Token) {
 	for _, t := range input {
 		os.Stdout.Write(append(t.Raw, ' '))
 	}
