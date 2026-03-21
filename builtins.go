@@ -20,7 +20,6 @@ func (Builtin) Stderr(input []Token) {
 		os.Stderr.Write(append(t.Raw, ' '))
 	}
 }
-
 func (Builtin) Stdout(input []Token) {
 	for _, t := range input {
 		os.Stdout.Write(append(t.Raw, ' '))

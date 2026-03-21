@@ -70,15 +70,15 @@ func mktok(note TokTypeNote, t TokType, raw []byte) Token {
 
 func (P) match_name(name []byte) (TokTypeNote, TokType) {
 	switch string(name) {
-		case "stdout": return TokTypeNote(FN), TokType(STDOUT)
-		case "stderr": return TokTypeNote(FN), TokType(STDERR)
-		case "run": return TokTypeNote(FN),  TokType(RUN)
-		case "?": return TokTypeNote(OPERATOR),  TokType(IF)
-		case "?!": return TokTypeNote(OPERATOR), TokType(ELSE)
-		case "&": return TokTypeNote(OPERATOR), TokType(AND)
-		case "|": return TokTypeNote(OPERATOR), TokType(OR)
-		case ";": return TokTypeNote(NONE), TokType(COMMENT)
-		default: return TokTypeNote(IGNORE), TokType(INVALID)
+		case "stdout": return TokTypeNote(FN),       TokType(STDOUT)
+		case "stderr": return TokTypeNote(FN),       TokType(STDERR)
+		case "run":    return TokTypeNote(FN),       TokType(RUN)
+		case "?":      return TokTypeNote(OPERATOR), TokType(IF)
+		case "?!":     return TokTypeNote(OPERATOR), TokType(ELSE)
+		case "&":      return TokTypeNote(OPERATOR), TokType(AND)
+		case "|":      return TokTypeNote(OPERATOR), TokType(OR)
+		case ";":      return TokTypeNote(NONE),     TokType(COMMENT)
+		default:       return TokTypeNote(IGNORE),   TokType(INVALID)
 	}
 }
 
@@ -102,9 +102,6 @@ func unmatch_token(tok Token) string {
 
 func (p *P) collapse_str() []byte {
 	var mem []byte
-	defer func(){
-		//fmt.Printf("|\x1b[33m%s\x1b[0m|\n", builtin.Un_Escape(mem))
-	}()
 	var esc bool
 	for p.next() {
 		if p.cur == '"' && !esc { return mem }
@@ -142,11 +139,8 @@ func (p *P) seek_to(c byte) []byte {
 			case '"': if esc {
 				mem = append(mem, p.cur)
 			} else {
-				//fmt.Printf("collapsing (%c)\n", c)
-				//fmt.Printf("before mem (\v\033[34m%s\033[0m\v)\n", string(mem))
 				mem = append(mem, p.collapse_str()...)
 				p.toss()
-				//fmt.Printf("after mem (\v\033[34m%s\033[0m\v)\n", string(mem))
 			}
 			
 			case c: if esc {
@@ -172,8 +166,6 @@ func (p *P) back() byte {
 
 func (p *P) seek_whitespace() []byte {
 	var mem []byte
-	defer func() {
-	}()
 	var esc bool
 	_ = esc
 	for p.next() {
