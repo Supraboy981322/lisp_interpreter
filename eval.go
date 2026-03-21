@@ -59,8 +59,15 @@ func eval(input []Token) []Token {
 		//for _, t := range input { t.print() }
 		thing := input[0]
 
+		if thing.Note == TokTypeNote(VALUE) && thing.Type != TokType(VOID) {
+			keeper.DrainInto(&mem, keeper.PtrOf(drain_args()))
+			goto skip
+		}
+
 		switch thing.Type {
 			case TokType(VOID): if len(input) <= 1 { return mem } else { goto skip }
+
+			case TokType(QUIT): return append(mem, thing)
 
 			//builtin functions
 			case TokType(STDOUT): { call(builtin.Stdout, void) }
