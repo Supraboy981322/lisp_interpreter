@@ -17,10 +17,14 @@ const (
 	FALSE   //'false'
 	OR      //'|'
 	AND     //'&'
-	STRING
 	BOX     //'('
 	EOX     //')'
 	COMMENT //';'
+	STRING
+	NUMBER
+	GREATER_THAN //'>'
+	LESS_THAN    //'<'
+	EQL_TO       //'='
 	WHITESPACE
 )
 
@@ -30,6 +34,7 @@ const (
 	FN
 	OPERATOR
 	VALUE
+	COMPARE
 	IGNORE
 )
 
@@ -53,13 +58,13 @@ func main() {
 	code, e := os.ReadFile(os.Args[1])
 	if e != nil { panic(e) }
 
-	//for _, t := range recurse(code) {
-	//	fmt.Printf(
-	//		"(%v) %s\n",
-	//		unmatch_token(t),
-	//		string(builtin.Un_Escape(t.Raw)),
-	//	)
-	//}
-	//fmt.Println("\n\n========\n\n")
-	eval(recurse(code))
+	for _, t := range recurse(code) {
+		fmt.Printf(
+			"(%v) %s\n",
+			unmatch_token(t),
+			string(builtin.Un_Escape(t.Raw)),
+		)
+	}
+	fmt.Println("\n\n========\n\n")
+	//eval(recurse(code))
 }

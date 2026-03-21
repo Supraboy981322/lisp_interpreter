@@ -24,6 +24,8 @@ func recurse(code []byte) []Token {
 			}
 		  case ')':
 				p.Toks = append(p.Toks, mktok(IGNORE, EOX, nil))
+			case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
+				p.Toks = append(p.Toks, mktok(VALUE, NUMBER, p.seek_num()))
 
 			//skip to newline
 			case ';': p.seek_to('\n')
