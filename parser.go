@@ -11,6 +11,7 @@ func recurse(code []byte) []Token {
 	}
 	for p.next() {
 		switch p.cur {
+			case '#': if p.peek() == '|' { p.comment() ; p.toss() }
 			case '(': if !p.esc {
 				p.Toks = append(p.Toks, mktok(IGNORE, BOX, nil))
 				thing := p.seek_whitespace()
@@ -24,7 +25,7 @@ func recurse(code []byte) []Token {
 		  case ')':
 				p.Toks = append(p.Toks, mktok(IGNORE, EOX, nil))
 
-			//skip to newline  TODO: multi-line comments
+			//skip to newline
 			case ';': p.seek_to('\n')
 
 			//might do something with this
@@ -38,4 +39,15 @@ func recurse(code []byte) []Token {
 		}
 	}
 	return p.Toks
+}
+
+func (p *P) comment() {
+	p.toss()
+	var depth int ; loop: for p.next() {
+		if p.cur == '#' && p.peek() == '|' { depth++ ; p.idx++ ; continue loop }
+		if p.cur == '|' && p.peek() == '#' {
+			if depth == 0 { p.toss() ; return }
+			depth-- ; continue loop
+		}
+	}
 }

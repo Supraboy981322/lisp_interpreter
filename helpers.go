@@ -126,7 +126,7 @@ func (p *P) collapse_str() []byte {
 	return mem
 }
 
-// TODO: more universal seek (ie: not having separate logic for string)
+// TODO: track depth to return full list 
 func (p *P) seek_to(c byte) []byte {
 	var mem []byte
 	var esc bool
