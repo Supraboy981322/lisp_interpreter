@@ -14,7 +14,7 @@ func recurse(code []byte) []Token {
 			case '#': if p.peek() == '|' { p.comment() ; p.toss() }
 			case '(': if !p.esc {
 				p.Toks = append(p.Toks, mktok(IGNORE, BOX, nil))
-				thing := p.seek_whitespace()
+				thing := p.seek_first()
 				note, t := p.match_name(thing)
 				p.Toks = append(p.Toks, mktok(note, t, thing))
 			}
