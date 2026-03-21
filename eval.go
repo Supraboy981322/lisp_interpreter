@@ -8,6 +8,10 @@ import (
 
 func eval(input []Token) {
 	if len(input) < 1 { return }
+	mk_args := func() []Token {
+		return nil
+	}
+	_ = mk_args
 	loop: {
 		thing := input[0]
 		switch thing.Type {

@@ -52,10 +52,10 @@ func seek_toks(input *[]Token) []Token {
 		keeper.Shift(input)
 		switch (*input)[0].Type {
 			case BOX: { depth++ }
-			case EOX: { depth-- }
+			case EOX: {
+				if depth-1 < 1 { return output } else { depth-- }
+			}
 		}
-		if len(*input) < 1 { return output }
-		started = true
 	}
 	return output
 }
@@ -84,8 +84,8 @@ func (P) match_name(name []byte) (TokTypeNote, TokType) {
 
 func unmatch_token(tok Token) string {
 	switch tok.Type {
-		case TokType(STDOUT):   return "[STDOUT]"
-		case TokType(STDERR):   return "[STDERR]"
+		case TokType(STDOUT):  return "[STDOUT]"
+		case TokType(STDERR):  return "[STDERR]"
 		case TokType(RUN):     return "[RUN]"
 		case TokType(IF):      return "[IF]"
 		case TokType(ELSE):    return "[ELSE]"
@@ -96,7 +96,8 @@ func unmatch_token(tok Token) string {
 		case TokType(STRING):  return "[STRING]"
 		case TokType(EOX):     return "[EOX]"
 		case TokType(BOX):     return "[BOX]"
-		default: panic("UNKNOWN TOKEN: |" + string(tok.Raw) + "|")
+		default:
+			panic("UNKNOWN TOKEN: |" + string(tok.Raw) + "|")
 	}
 }
 

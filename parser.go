@@ -38,6 +38,7 @@ func recurse(code []byte) []Token {
 			}
 		}
 	}
+
 	return p.Toks
 }
 

@@ -1,8 +1,8 @@
 (stdout "\e[33mcar\bt\e[0m =\t=\nfoo\rb\vfoo\a\n\"\v\r\n")
 (run "(stdout \"bar\n\")")
-(stderr "foo")
+(stderr "foo" "\n")
 #|
  TODO: evaluate conditions
- (stdout (? true "is true" "is false"))
+ (stdout (? (< 1 0) "is true" "is false"))
   #| nested comment |#
 |#
