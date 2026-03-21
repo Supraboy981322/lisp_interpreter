@@ -14,6 +14,10 @@ func (Builtin) Err_Out(str string) {
 	os.Stderr.WriteString("\n" + str + "\n")
 	os.Exit(1)
 }
+func (b Builtin) Err_OutF(format string, args ...any) {
+	str := fmt.Sprintf(format, args)
+	b.Err_Out(str)
+}
 
 func (Builtin) Stderr(input []Token, _ Token) []Token {
 	for _, t := range input {

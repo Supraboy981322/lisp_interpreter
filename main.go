@@ -54,18 +54,28 @@ type Token struct {
 
 func _(){fmt.Print()}
 
+var debug bool
+
 func main() {
 	if len(os.Args) < 2 { builtin.Err_Out("not enough args, need filename") }
 	code, e := os.ReadFile(os.Args[1])
 	if e != nil { panic(e) }
-
-	for _, t := range recurse(code) {
-		fmt.Printf(
-			"(%v) %s\n",
-			unmatch_token(t),
-			string(builtin.Un_Escape(t.Raw)),
-		)
+	if len(os.Args) > 2 {
+		switch os.Args[2] {
+			case "debug": debug = true
+			default: builtin.Err_OutF("unknown arg: %s", os.Args[2])
+		}
 	}
-	fmt.Println("\n\n========\n\n")
+
+	if debug {
+		for _, t := range recurse(code) {
+			fmt.Printf(
+				"(%v) %s\n",
+				unmatch_token(t),
+				string(builtin.Un_Escape(t.Raw)),
+			)
+		}
+		fmt.Println("\n\n========\n\n")
+	}
 	recurse_eval(recurse(code), void)
 }

@@ -10,7 +10,7 @@ import (
 func eval(input []Token) []Token {
 	//ignore empty input
 	if len(input) < 1 { return []Token{} }
-	fmt.Println("eval")
+	if debug { fmt.Println("eval") }
 
 	shiftN := func(n int) {
 		loop: {
@@ -117,7 +117,7 @@ func eval(input []Token) []Token {
 			if 0 < len(input) { goto loop }
 		}
 	}
-	fmt.Println("eval done")
+	if debug { fmt.Println("eval done") }
 	return mem
 }
 
