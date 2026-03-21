@@ -26,6 +26,7 @@ const (
 	LESS_THAN    //'<'
 	EQL_TO       //'='
 	WHITESPACE
+	VOID
 )
 
 type TokTypeNote int
@@ -66,5 +67,5 @@ func main() {
 		)
 	}
 	fmt.Println("\n\n========\n\n")
-	//eval(recurse(code))
+	recurse_eval(recurse(code))
 }
