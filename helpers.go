@@ -43,17 +43,25 @@ func (p *P) peekN(n int) []byte {
 }
 
 func seek_toks(input *[]Token) []Token {
-	var output []Token
-	var depth int
-	var started bool
-	for {
-		if started && depth < 1 { break }
-		keeper.Add(&output, (*input)[0])
+	var output, mem []Token
+	var recursing bool
+	for len(*input) > 0 {
+		thing := (*input)[0]
 		keeper.Shift(input)
-		switch (*input)[0].Type {
-			case BOX: { depth++ }
+		switch thing.Type {
+			case BOX: { recursing = true }
 			case EOX: {
-				if depth-1 < 1 { return output } else { depth-- }
+				if recursing {
+					keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem)))
+					mem = []Token{}
+					recursing = false
+				} else { return output }
+			}
+			default: 
+			if recursing {
+				keeper.Add(&mem, thing)
+			} else {
+				keeper.Add(&output, thing)
 			}
 		}
 	}
@@ -103,6 +111,7 @@ func unmatch_token(tok Token) string {
 		case TokType(LESS_THAN):    return "[LESS_THAN]"
 		case TokType(EQL_TO):       return "[EQL_TO]"
 		case TokType(NUMBER):       return "[NUMBER]"
+		case TokType(VOID):         return "[VOID]"
 		default:
 			panic("UNKNOWN TOKEN: |" + string(tok.Raw) + "|")
 	}
@@ -197,4 +206,37 @@ func (p *P) seek_num() []byte {
 		}
 	}
 	return nil
+}
+
+func void_tok() Token {
+	return Token {
+		Raw: []byte("[void]"),
+		Type: TokType(VOID),
+		Note: TokTypeNote(VALUE),
+	}
+}
+
+func (t Token) note() string {
+	switch t.Note {
+		case NONE:     return "[NONE]"
+		case FN:       return "[FN]"
+		case OPERATOR: return "[OPERATOR]"
+		case VALUE:    return "[VALUE]"
+		case COMPARE:  return "[COMPARE]"
+		case IGNORE:   return "[IGNORE]"
+		default: panic("MISSING NOTE TYPE in Token.note()")
+	}
+}
+
+func (t Token) print() {
+	fmt.Printf(
+		"token {\n" + 
+		"  \x1b[38;2;0;245;240mRaw\x1b[0m:  %#v, \x1b[3;38;2;125;125;125m//%s\x1b[0m\n" + 
+		"  \x1b[38;2;0;245;240mType\x1b[0m: %s, \x1b[3;38;2;125;125;125m//%d\x1b[0m\n" +
+		"  \x1b[38;2;0;245;240mNote\x1b[0m: %s, \x1b[3;38;2;125;125;125m//%d\x1b[0m\n" +
+		"}\n",
+		t.Raw, builtin.Un_Escape(t.Raw),
+		unmatch_token(t), t.Type,
+		t.note(), t.Note,
+	)
 }
