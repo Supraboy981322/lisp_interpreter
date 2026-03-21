@@ -1,5 +1,10 @@
 package main
 
+import (
+	"os"
+	"fmt"
+)
+
 type TokType int
 const (
 	INVALID TokType = iota
@@ -13,6 +18,7 @@ const (
 	EOX
 	BOX
 	COMMENT
+	WHITESPACE
 )
 
 type TokTypeNote int
@@ -36,11 +42,16 @@ type Token struct {
 	Type TokType
 	Note TokTypeNote
 }
+
+func _(){fmt.Print()}
+
 func main() {
-	code := []byte(`
-(print "\e[33mcar\bt\e[0m =\t=\nfoo\rb\vfoo\a\n\"")
-; (run "(print \"bar\")")
-(print "\nfoo")
-`)
+	if len(os.Args) < 2 { builtin.Err_Out("not enough args, need filename") }
+	code, e := os.ReadFile(os.Args[1])
+	if e != nil { panic(e) }
+
+	//for _, t := range recurse(code) {
+	//	fmt.Println(string(t.Raw))
+	//}
 	eval(recurse(code))
 }
