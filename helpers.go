@@ -273,3 +273,9 @@ func get_note(raw []byte) ([]byte, []byte) {
 	if thing == nil { thing = raw }
 	return thing, note
 }
+
+func debug(msg string, args ...any) {
+	if debug_mode {
+		fmt.Printf(msg + "\n", args...)
+	}
+}
