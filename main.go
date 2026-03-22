@@ -58,7 +58,7 @@ type Token struct {
 
 func _(){fmt.Print()}
 
-var debug, repl bool
+var debug_mode, repl bool
 
 func main() {
 	var code []byte
@@ -74,7 +74,7 @@ func main() {
 		switch a {
 			case "eval": code = []byte(next_arg(i+1, a))
 			case "repl": repl = true
-			case "debug": debug = true
+			case "debug": debug_mode = true
 			default:
 				var e error
 				code, e = os.ReadFile(os.Args[1])
@@ -95,7 +95,7 @@ func main() {
 }
 
 func run(code []byte) []Token {
-	if debug {
+	if debug_mode {
 		for _, t := range recurse(code) {
 			fmt.Printf(
 				"(%v) %s\n",
