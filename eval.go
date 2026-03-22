@@ -79,6 +79,8 @@ func eval(input []Token) []Token {
 			case TokType(GREATER_THAN), TokType(LESS_THAN), TokType(EQL_TO): {
 				call(compare, thing)
 			}
+		
+			case TokType(IF): { call(conditional, thing) }
 
 			//return on EOX
 			case TokType(EOX): return mem
@@ -159,5 +161,12 @@ func compare(args []Token, how Token) []Token {
 		case EQL_TO: if nums[0] == nums[1] { return []Token{True} } else { return []Token{False} }
 	}
 
+	return []Token{void}
+}
+
+func conditional(args []Token, _ Token) []Token {
+	for _, a := range args {
+		a.print()
+	}
 	return []Token{void}
 }
