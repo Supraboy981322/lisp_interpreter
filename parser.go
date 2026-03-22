@@ -9,7 +9,7 @@ func recurse(code []byte) []Token {
 		idx: -1,
 		code: code,
 	}
-	for p.next() {
+	loop: for p.next() {
 		switch p.cur {
 			case '#': if p.peek() == '|' { p.comment() ; p.toss() }
 			case '(': if !p.esc {
@@ -26,9 +26,6 @@ func recurse(code []byte) []Token {
 		  case ')':
 				p.Toks = append(p.Toks, mktok(IGNORE, EOX, nil, nil))
 
-			case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-				p.Toks = append(p.Toks, mktok(VALUE, NUMBER, p.seek_num(), nil))
-
 			//skip to newline
 			case ';': p.seek_to('\n')
 
@@ -37,6 +34,11 @@ func recurse(code []byte) []Token {
 
 			default: {
 				thing, note := get_note(p.seek_first())
+				if is_num(thing) {
+					fmt.Println("is num")
+					p.Toks = append(p.Toks, mktok(VALUE, NUMBER, thing, note))
+					continue loop
+				}
 				//thing := append([]byte{p.cur}, p.seek_whitespace()...)
 				internal_note, t := p.match_name(thing)
 				p.Toks = append(p.Toks, mktok(internal_note, t, thing, note))
