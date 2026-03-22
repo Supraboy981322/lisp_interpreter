@@ -251,12 +251,14 @@ func (t Token) print() {
 	fmt.Printf(
 		"token {\n" + 
 		"  \x1b[38;2;0;245;240mRaw\x1b[0m:  %#v, \x1b[3;38;2;125;125;125m//%s\x1b[0m\n" + 
-		"  \x1b[38;2;0;245;240mType\x1b[0m: %s, \x1b[3;38;2;125;125;125m//%d\x1b[0m\n" +
-		"  \x1b[38;2;0;245;240mNote\x1b[0m: %s, \x1b[3;38;2;125;125;125m//%d\x1b[0m\n" +
+		"  \x1b[38;2;0;245;240mType\x1b[0m: %s, \x1b[3;38;2;125;125;125m//%d\x1b[0m\n"  +
+		"  \x1b[38;2;0;245;240mNote\x1b[0m: %s, \x1b[3;38;2;125;125;125m//%d\x1b[0m\n"  +
+		"  \x1b[38;2;0;245;240mUser_Note\x1b[0m: %#v, \x1b[3:38;2;125;125;125m//%s\x1b[0m\n" +
 		"}\n",
 		t.Raw, builtin.Un_Escape(t.Raw),
 		unmatch_token(t), t.Type,
 		t.note(), t.Note,
+		t.User_Note, string(t.User_Note),
 	)
 }
 
