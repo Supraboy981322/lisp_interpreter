@@ -9,6 +9,11 @@ func recurse(code []byte) []Token {
 		idx: -1,
 		code: code,
 	}
+	defer func() {
+		if debug_mode {
+			for _, t := range p.Toks { t.print() }
+		}
+	}()
 	loop: for p.next() {
 		switch p.cur {
 			case '#': if p.peek() == '|' { p.comment() ; p.toss() }
