@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"fmt"
+	"strconv"
+	"math/big"
 )
 
 func _(){fmt.Print()}
@@ -69,4 +71,51 @@ func (Builtin) Un_Escape(str []byte) []byte {
 		if i < len(str) { goto loop }
 	}
 	return res
+}
+
+//this is perfect for Zig, I hate that I have to cast the return type
+func (Builtin) ToNum(str []byte, int_type IntType) (*big.Int, int64) {
+	var e error
+	var res int64
+	switch int_type {
+		case BIG: {
+			res := new(big.Int)
+			res, ok := res.SetString(string(str), 0)
+			if !ok {
+				builtin.Err_OutF("NaN: %s", string(str))
+			}
+			return res, 0
+		}
+		case U8: {
+			var n uint64
+			n, e = strconv.ParseUint(string(str), 0, 8)
+			res = int64(n)
+		}
+		case I8: {
+			res, e = strconv.ParseInt(string(str), 0, 8)
+		}
+		case U16: {
+			var n uint64
+			n, e = strconv.ParseUint(string(str), 0, 8)
+			res = int64(n)
+		}
+		case I16: {
+			res, e = strconv.ParseInt(string(str), 0, 16)
+		}
+		case U32: {
+			var n uint64
+			n, e = strconv.ParseUint(string(str), 0, 32)
+			res = int64(n)
+		}
+		case I32: {
+			res, e = strconv.ParseInt(string(str), 0, 32)
+		}
+		case I64: {
+			res, e = strconv.ParseInt(string(str), 0, 64)
+		}
+	}
+	if e != nil {
+		builtin.Err_OutF("NaN: %s", string(str))
+	}
+	return nil, res
 }
