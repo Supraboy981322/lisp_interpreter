@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 	"fmt"
-	"strconv"
 	keeper "github.com/Supraboy981322/keeper/golang"
 )
 
@@ -74,9 +73,10 @@ func eval(input []Token) []Token {
 
 				params := drain_args()
 				var code int
-				if len(params) > 0 { 
+				if len(params) > 0 {
 					if params[0].Type != NUMBER { builtin.Err_Out("NaN: " + string(params[0].Raw)) }
-					code, _ = strconv.Atoi(string(params[0].Raw))
+					_, n := builtin.ToNum(params[0].Raw, U8)
+					code = int(n)
 				}
 				os.Exit(code)
 			}
@@ -148,10 +148,9 @@ func recurse_eval(input []Token, _ Token) []Token {
 }
 
 func compare(args []Token, how Token) []Token {
-	nums := []int{}
+	nums := []int64{}
 	for _, a := range args {
-		if a.Type != NUMBER { builtin.Err_Out("NaN: " + string(a.Raw)) }
-		n, _ := strconv.Atoi(string(a.Raw))
+		_, n := builtin.ToNum(a.Raw, I64)
 		keeper.Add(&nums, n)
 	}
 
