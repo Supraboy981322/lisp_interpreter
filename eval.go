@@ -10,7 +10,7 @@ import (
 func eval(input []Token) []Token {
 	//ignore empty input
 	if len(input) < 1 { return []Token{} }
-	if debug { fmt.Println("eval") }
+	debug("eval")
 
 	shiftN := func(n int) {
 		loop: {
@@ -125,7 +125,7 @@ func eval(input []Token) []Token {
 			if 0 < len(input) { goto loop }
 		}
 	}
-	if debug { fmt.Println("eval done") }
+	debug("eval done")
 	return mem
 }
 
@@ -154,19 +154,24 @@ func compare(args []Token, how Token) []Token {
 		)
 	}
 
-	//these could've been reduced to ternaries
+	var res bool
 	switch how.Type {
-		case GREATER_THAN: if nums[0] > nums[1] { return []Token{True} } else { return []Token{False} }
-		case LESS_THAN: if nums[0] < nums[1] { return []Token{True} } else { return []Token{False} }
-		case EQL_TO: if nums[0] == nums[1] { return []Token{True} } else { return []Token{False} }
+		case GREATER_THAN: res = (nums[0] > nums[1])
+		case LESS_THAN:    res = (nums[0] < nums[1])
+		case EQL_TO:       res = (nums[0] == nums[1])
 	}
 
-	return []Token{void}
+	//this could've been a ternary
+	if res { 
+		return []Token{True}
+	} else {
+		return []Token{True}
+	}
 }
 
 func conditional(args []Token, _ Token) []Token {
-	for _, a := range args {
+	if debug_mode { for _, a := range args {
 		a.print()
-	}
+	}}
 	return []Token{void}
 }
