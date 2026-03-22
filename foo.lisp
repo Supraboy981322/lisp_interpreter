@@ -4,7 +4,8 @@
 ;(print[out] "\nfarts" "\rp\n")
 ;(print[err] "\nbar" "\bt\n" "\r")
 
-(print[err] "foo\n")
+;(print[err] "foo\n")
+(print[out] (< 1 0) "foo" "bar")
 
 #|
  TODO: evaluate conditions
