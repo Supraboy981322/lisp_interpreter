@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	keeper "github.com/Supraboy981322/keeper/golang"
 )
 
@@ -213,25 +214,21 @@ func (p *P) seek_whitespace() []byte {
 	_ = esc
 	for p.next() {
 		switch p.cur {
-			case ' ', '\n', '\t', '\r': return mem
+			case ' ', '\n', '\t', '\r', ')': return mem
 			default: mem = append(mem, p.cur)
 		}
 	}
 
-	return nil
+	return mem
 }
 
 func (p *P) seek_num() []byte {
-	str := []byte{p.cur}
-	defer p.back()
-	for p.next() {
-		if p.cur >= '0' && p.cur <= '9' {
-			keeper.Add(&str, p.cur)
-		} else {
-			return str
-		}
+	p.back()
+	thing := p.seek_whitespace() 
+	if !is_num(thing) {
+		builtin.Err_OutF("NaN: %s", string(thing))
 	}
-	return nil
+	return thing
 }
 
 func void_return() []Token {
@@ -279,4 +276,9 @@ func debug(msg string, args ...any) {
 	if debug_mode {
 		fmt.Printf(msg + "\n", args...)
 	}
+}
+
+func is_num(str []byte) bool {
+	_, e := strconv.ParseUint(string(str), 0, 64)
+	return e == nil
 }
