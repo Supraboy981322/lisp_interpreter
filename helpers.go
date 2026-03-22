@@ -49,9 +49,12 @@ func seek_toks(input *[]Token) []Token {
 		thing := (*input)[0]
 		keeper.Shift(input)
 		switch thing.Type {
-			case BOX: { recursing = true }
+			case BOX: {
+				recursing = true
+			}
 
 			case EOX: if recursing {
+				fmt.Printf("recursing EOX |%s|\n", string(mem[0].Raw))
 		 	  keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem, void)))
 				mem = []Token{}
 				recursing = false
@@ -82,7 +85,7 @@ func (P) match_name(name []byte) (TokTypeNote, TokType) {
 	switch string(name) {
 		case "print": return TokTypeNote(FN),       TokType(PRINT)
 		case "run":    return TokTypeNote(FN),       TokType(RUN)
-		case "?":      return TokTypeNote(OPERATOR), TokType(IF)
+		case "?", "if":      return TokTypeNote(OPERATOR), TokType(IF)
 		case "?!":     return TokTypeNote(OPERATOR), TokType(ELSE)
 		case "&":      return TokTypeNote(OPERATOR), TokType(AND)
 		case "|":      return TokTypeNote(OPERATOR), TokType(OR)
@@ -183,6 +186,7 @@ func (p *P) previous() byte {
 
 func (p *P) back() byte {
 	p.cur = p.previous()
+	p.idx--
 	return p.cur
 }
 
