@@ -1,0 +1,46 @@
+#+title: TODO
+
+- [-] builtins
+  - [X] print to terminal (~print[...] ...~)
+    - [X] stdout (~print[out] ...~)
+    - [X] stderr (~print[err] ...~)
+  - [X] evaluate string as code (~run "..."~)
+  - [ ] math
+    - [ ] add (~+ ...~)
+    - [ ] subtract (~- ...~)
+    - [ ] multiply (~* ...~)
+    - [ ] divide (~/ ...~)
+  - [ ] read (~read[...]~)
+    - [ ] file (~read[file] "..."~)
+  - [ ] stdin (~read[in]~)
+  - [ ] parse-time (~@...~)
+    - [ ] import (~@import "..."~)
+    - [ ] include (~@include "..."~)
+    - [ ] embed (~@embed "..."~)
+    - [ ] eval (~@eval (...)~)
+    - [ ] fetch (~@fetch "..."~)
+- [-] syntax
+  - [X] comments
+    - [X] single-line (~;~)
+    - [X] multi-line (~#| ... |#~)
+  - [-] flags (~[...]~)
+    - [ ] list of flags (~[... ...]~)
+    - [X] basic flags (~[...]~)
+  - [-] conditional (~?~ or ~if~)
+  - [X] comparison
+  - [ ] parse-time functions (~@...~)
+  - [ ] function definitions (~@fn ... (...)~)
+  - [ ] variables (~let ... ...~)
+  - [ ] constants (~set ... ...~)
+- [ ] state
+  - [ ] variables
+  - [ ] decide what to put here
+- [ ] standard library
+  - [ ] tcp
+  - [ ] http
+  - [ ] fs
+  - [ ] os
+- [-] interpreter features
+  - [ ] package code with interpreter into a binary
+  - [X] run code from string passed as cli arg
+  - [X] run code from file
