@@ -52,7 +52,7 @@ func seek_toks(input *[]Token) []Token {
 			case BOX: { recursing = true }
 
 			case EOX: if recursing {
-		 	 keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem, void)))
+		 	  keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem, void)))
 				mem = []Token{}
 				recursing = false
 			} else {
@@ -69,18 +69,18 @@ func seek_toks(input *[]Token) []Token {
 	return output
 }
 
-func mktok(note TokTypeNote, t TokType, raw []byte) Token {
+func mktok(note TokTypeNote, t TokType, raw []byte, user_note []byte) Token {
 	return Token {
 		Type: t,
 		Raw: raw,
 		Note: note,
+		User_Note: user_note,
 	}
 }
 
 func (P) match_name(name []byte) (TokTypeNote, TokType) {
 	switch string(name) {
-		case "stdout": return TokTypeNote(FN),       TokType(STDOUT)
-		case "stderr": return TokTypeNote(FN),       TokType(STDERR)
+		case "print": return TokTypeNote(FN),       TokType(PRINT)
 		case "run":    return TokTypeNote(FN),       TokType(RUN)
 		case "?":      return TokTypeNote(OPERATOR), TokType(IF)
 		case "?!":     return TokTypeNote(OPERATOR), TokType(ELSE)
@@ -98,8 +98,7 @@ func (P) match_name(name []byte) (TokTypeNote, TokType) {
 
 func unmatch_token(tok Token) string {
 	switch tok.Type {
-		case TokType(STDOUT):       return "[STDOUT]"
-		case TokType(STDERR):       return "[STDERR]"
+		case TokType(PRINT):       return "[PRINT]"
 		case TokType(RUN):          return "[RUN]"
 		case TokType(IF):           return "[IF]"
 		case TokType(ELSE):         return "[ELSE]"
@@ -188,7 +187,7 @@ func (p *P) back() byte {
 }
 
 func (p *P) seek_first() []byte {
-	var mem []byte
+	mem := []byte{p.cur}
 	var esc bool
 	defer p.back()
 	_ = esc
@@ -257,4 +256,16 @@ func (t Token) print() {
 		unmatch_token(t), t.Type,
 		t.note(), t.Note,
 	)
+}
+
+func get_note(raw []byte) ([]byte, []byte) {
+	var note, thing []byte
+	for i, b :=  range raw {
+		if b == '[' {
+			note = raw[i+1:len(raw)-1]
+			thing = raw[:i]
+		}
+	}
+	if thing == nil { thing = raw }
+	return thing, note
 }

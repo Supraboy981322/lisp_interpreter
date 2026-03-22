@@ -11,8 +11,7 @@ import (
 type TokType int
 const (
 	INVALID TokType = iota
-	STDOUT  //'stdout'
-	STDERR  //'stderr'
+	PRINT   //'print'
 	RUN     //'run'
 	QUIT    //'quit'
 	IF      //'?'
@@ -54,6 +53,7 @@ type Token struct {
 	Raw []byte
 	Type TokType
 	Note TokTypeNote
+	User_Note []byte
 }
 
 func _(){fmt.Print()}

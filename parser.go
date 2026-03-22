@@ -1,8 +1,8 @@
 package main
 
-import (_"os";"fmt")
+import ("os";"fmt")
 
-func _(){fmt.Print()}
+func _(){fmt.Print();os.Exit(0)}
 
 func recurse(code []byte) []Token {
 	var p = P{
@@ -13,19 +13,21 @@ func recurse(code []byte) []Token {
 		switch p.cur {
 			case '#': if p.peek() == '|' { p.comment() ; p.toss() }
 			case '(': if !p.esc {
-				p.Toks = append(p.Toks, mktok(IGNORE, BOX, nil))
-				thing := p.seek_first()
-				note, t := p.match_name(thing)
-				p.Toks = append(p.Toks, mktok(note, t, thing))
+				p.Toks = append(p.Toks, mktok(IGNORE, BOX, nil, nil))
+				p.next()
+				thing, note := get_note(p.seek_first())
+				internal_note, t := p.match_name(thing)
+				p.Toks = append(p.Toks, mktok(internal_note, t, thing, note))
 			}
 			case '\\': p.esc = !p.esc
 			case '"': if !p.esc {
-				p.Toks = append(p.Toks, mktok(VALUE, STRING, p.collapse_str()))
+				p.Toks = append(p.Toks, mktok(VALUE, STRING, p.collapse_str(), nil))
 			}
 		  case ')':
-				p.Toks = append(p.Toks, mktok(IGNORE, EOX, nil))
+				p.Toks = append(p.Toks, mktok(IGNORE, EOX, nil, nil))
+
 			case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-				p.Toks = append(p.Toks, mktok(VALUE, NUMBER, p.seek_num()))
+				p.Toks = append(p.Toks, mktok(VALUE, NUMBER, p.seek_num(), nil))
 
 			//skip to newline
 			case ';': p.seek_to('\n')
@@ -34,9 +36,10 @@ func recurse(code []byte) []Token {
 			case '\n', ' ', '\r', '\t':
 
 			default: {
-				thing := append([]byte{p.cur}, p.seek_whitespace()...)
-				note, t := p.match_name(thing)
-				p.Toks = append(p.Toks, mktok(note, t, thing))
+				thing, note := get_note(p.seek_first())
+				//thing := append([]byte{p.cur}, p.seek_whitespace()...)
+				internal_note, t := p.match_name(thing)
+				p.Toks = append(p.Toks, mktok(internal_note, t, thing, note))
 			}
 		}
 	}

@@ -70,9 +70,8 @@ func eval(input []Token) []Token {
 			case TokType(QUIT): return append(mem, thing)
 
 			//builtin functions
-			case TokType(STDOUT): { call(builtin.Stdout, void) }
-			case TokType(STDERR): { call(builtin.Stderr, void) }
-			case TokType(RUN):    {
+			case TokType(PRINT): { call(builtin.Print, thing) }
+			case TokType(RUN):   {
 				keeper.DrainInto(&mem, keeper.PtrOf(recurse_eval(recurse(string_args()), thing)))
 			}
 
