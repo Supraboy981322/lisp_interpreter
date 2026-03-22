@@ -72,13 +72,14 @@ func main() {
 	loop: for i, a := range os.Args[1:] {
 		if slices.Contains(taken, i) { continue loop }
 		switch a {
-			case "eval": code = []byte(next_arg(i+1, a))
-			case "repl": repl = true
-			case "debug": debug_mode = true
-			default:
+			case "eval":  { code = []byte(next_arg(i+1, a)) }
+			case "repl":  { repl = true }
+			case "debug": { debug_mode = true }
+			default: {
 				var e error
 				code, e = os.ReadFile(os.Args[1])
 				if e != nil { builtin.Err_OutF("couldn't read file: %v", e) }
+			}
 		}
 	}
 	
@@ -95,8 +96,9 @@ func main() {
 }
 
 func run(code []byte) []Token {
+	tokens := recurse(code)
 	if debug_mode {
-		for _, t := range recurse(code) {
+		for _, t := range tokens {
 			fmt.Printf(
 				"(%v) %s\n",
 				unmatch_token(t),
@@ -105,5 +107,5 @@ func run(code []byte) []Token {
 		}
 		fmt.Println("\n\n========\n\n")
 	}
-	return recurse_eval(recurse(code), void)
+	return recurse_eval(tokens, void)
 }
