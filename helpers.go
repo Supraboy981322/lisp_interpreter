@@ -83,19 +83,20 @@ func mktok(note TokTypeNote, t TokType, raw []byte, user_note []byte) Token {
 
 func (P) match_name(name []byte) (TokTypeNote, TokType) {
 	switch string(name) {
-		case "print": return TokTypeNote(FN),       TokType(PRINT)
-		case "run":    return TokTypeNote(FN),       TokType(RUN)
-		case "?", "if":      return TokTypeNote(OPERATOR), TokType(IF)
-		case "?!":     return TokTypeNote(OPERATOR), TokType(ELSE)
-		case "&":      return TokTypeNote(OPERATOR), TokType(AND)
-		case "|":      return TokTypeNote(OPERATOR), TokType(OR)
-		case ";":      return TokTypeNote(NONE),     TokType(COMMENT)
-		case "<":      return TokTypeNote(COMPARE),  TokType(LESS_THAN)
-		case ">":      return TokTypeNote(COMPARE),  TokType(GREATER_THAN)
-		case "=":      return TokTypeNote(COMPARE),  TokType(EQL_TO)
-		case "TRUE":   return TokTypeNote(VALUE),    TokType(TRUE)
-		case "FALSE":  return TokTypeNote(VALUE),    TokType(FALSE)
-		default:       return TokTypeNote(IGNORE),   TokType(INVALID)
+		case "print":   return TokTypeNote(FN),       TokType(PRINT)
+		case "quit":    return TokTypeNote(FN),       TokType(QUIT)
+		case "run":     return TokTypeNote(FN),       TokType(RUN)
+		case "?", "if": return TokTypeNote(OPERATOR), TokType(IF)
+		case "?!":      return TokTypeNote(OPERATOR), TokType(ELSE)
+		case "&":       return TokTypeNote(OPERATOR), TokType(AND)
+		case "|":       return TokTypeNote(OPERATOR), TokType(OR)
+		case ";":       return TokTypeNote(NONE),     TokType(COMMENT)
+		case "<":       return TokTypeNote(COMPARE),  TokType(LESS_THAN)
+		case ">":       return TokTypeNote(COMPARE),  TokType(GREATER_THAN)
+		case "=":       return TokTypeNote(COMPARE),  TokType(EQL_TO)
+		case "TRUE":    return TokTypeNote(VALUE),    TokType(TRUE)
+		case "FALSE":   return TokTypeNote(VALUE),    TokType(FALSE)
+		default:        return TokTypeNote(IGNORE),   TokType(INVALID)
 	}
 }
 
