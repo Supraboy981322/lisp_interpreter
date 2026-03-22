@@ -5,7 +5,7 @@
 ;(print[err] "\nbar" "\bt\n" "\r")
 
 ;(print[err] "foo\n")
-(print[out] (< 1 0) "foo" "bar")
+(print[out] (? (< 1 0) "foo" "bar"))
 
 #|
  TODO: evaluate conditions
