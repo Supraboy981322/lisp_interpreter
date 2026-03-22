@@ -67,7 +67,19 @@ func eval(input []Token) []Token {
 		switch thing.Type {
 			case TokType(VOID): if len(input) <= 1 { return mem } else { goto skip }
 
-			case TokType(QUIT): return append(mem, thing)
+			// TODO: registering cleanup fn before quit
+			case TokType(QUIT): {
+				// TODO: close program without executing registered cleanup fn 
+				// if string(thing.User_Note) == "dirty" { }
+
+				params := drain_args()
+				var code int
+				if len(params) > 0 { 
+					if params[0].Type != NUMBER { builtin.Err_Out("NaN: " + string(params[0].Raw)) }
+					code, _ = strconv.Atoi(string(params[0].Raw))
+				}
+				os.Exit(code)
+			}
 
 			//builtin functions
 			case TokType(PRINT): { call(builtin.Print, thing) }
