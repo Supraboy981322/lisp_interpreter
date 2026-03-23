@@ -10,9 +10,9 @@ func recurse(code []byte) []Token {
 		code: code,
 	}
 	defer func() {
-		if debug_mode {
-			for _, t := range p.Toks { t.print() }
-		}
+		//if debug_mode {
+		//	for _, t := range p.Toks { t.print() }
+		//}
 	}()
 	loop: for p.next() {
 		switch p.cur {
@@ -40,7 +40,7 @@ func recurse(code []byte) []Token {
 			default: {
 				thing, note := get_note(p.seek_first())
 				if is_num(thing) {
-					fmt.Println("is num")
+					debug("is num")
 					p.Toks = append(p.Toks, mktok(VALUE, NUMBER, thing, note))
 					continue loop
 				}
