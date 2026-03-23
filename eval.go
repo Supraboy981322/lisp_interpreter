@@ -44,12 +44,18 @@ func eval(input []Token) []Token {
 	}
 
 	var mem []Token
-	//defer func() {
-	//	for _, t := range mem { t.print() }
-	//}()
+	defer func() {
+		//if do_print {
+		//	for _, t := range mem { t.print() }
+		//}
+	}()
 
 	call := func(f func([]Token, Token)[]Token, caller Token) {
-		keeper.DrainInto(&mem, keeper.PtrOf(f(drain_args(), caller))) 
+		len_before := len(input)
+		drained := drain_args()
+		len_after := len(input)
+		debug("(%d > %d) == %t", len_before, len_after, len_before > len_after)
+		keeper.DrainInto(&mem, keeper.PtrOf(f(drained, caller))) 
 	}
 
 	//who needs a 'for' loop anyways?
@@ -90,9 +96,13 @@ func eval(input []Token) []Token {
 			//comparison
 			case TokType(GREATER_THAN), TokType(LESS_THAN), TokType(EQL_TO): {
 				call(compare, thing)
+				debug("compare evaluated")
+				for _, t := range mem { t.print() }
 			}
 		
-			case TokType(IF): { call(conditional, thing) }
+			case TokType(IF): {
+				call(conditional, thing)
+		}
 
 			//return on EOX
 			case TokType(EOX): return mem
@@ -181,8 +191,9 @@ func compare(args []Token, how Token) []Token {
 }
 
 func conditional(args []Token, _ Token) []Token {
-	if debug_mode { for _, a := range args {
-		a.print()
-	}}
+	debug("conditonal(args [%d]Token, _)", len(args))
+	//if debug_mode { for _, a := range args {
+	//	a.print()
+	//}}
 	return []Token{void}
 }
