@@ -77,7 +77,7 @@ func main() {
 			case "debug": { debug_mode = true }
 			default: {
 				var e error
-				code, e = os.ReadFile(os.Args[1])
+				code, e = os.ReadFile(a)
 				if e != nil { builtin.Err_OutF("couldn't read file: %v", e) }
 			}
 		}
