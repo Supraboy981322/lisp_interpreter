@@ -46,20 +46,32 @@ func (p *P) peekN(n int) []byte {
 func seek_toks(input *[]Token) []Token {
 	var output, mem []Token
 	var recursing bool
+	defer func() {
+		debug("seek_toks() returning")
+		if len(output) > 0 {
+			//if output[0].Type == IF { for _, t := range output { t.print() } }
+		}
+	}()
 	for len(*input) > 0 {
 		thing := (*input)[0]
 		keeper.Shift(input)
 		switch thing.Type {
 			case BOX: {
+				debug("seek_toks() recursing")
 				recursing = true
 			}
 
 			case EOX: if recursing {
-				fmt.Printf("recursing EOX |%s|\n", string(mem[0].Raw))
-		 	  keeper.DrainInto(&output, keeper.PtrOf(recurse_eval(mem, void)))
+				debug("recursing EOX |%s|\n", string(mem[0].Raw))
+				new_mem := recurse_eval(mem, void)
+				debug("seek_toks() new_mem = [%d]Token", len(new_mem))
+				for _, t := range new_mem { t.print() }
+		 	  keeper.DrainInto(&output, keeper.PtrOf(new_mem))
+				debug("seek_toks() output = [%d]Token", len(output))
 				mem = []Token{}
 				recursing = false
 			} else {
+				debug("seek_toks() returning [%d]Token", len(output))
 				return output
 			}
 
